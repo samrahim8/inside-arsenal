@@ -1,5 +1,4 @@
 import type { MatchData } from "@/app/lib/football-data";
-import { ARSENAL_TEAM_ID } from "@/app/lib/football-data";
 
 interface FixturesProps {
   results: MatchData[];
@@ -147,5 +146,3 @@ export default function Fixtures({ results, upcoming }: FixturesProps) {
     </section>
   );
 }
-
-export { ARSENAL_TEAM_ID };
