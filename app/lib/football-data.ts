@@ -1,6 +1,44 @@
-const BASE_URL = "https://www.thesportsdb.com/api/v1/json/3";
-const ARSENAL_ID = "133604";
-const PREMIER_LEAGUE_ID = "4328";
+// Uses football-data.org API (requires free API key)
+// Get your key at: https://www.football-data.org/client/register
+
+const BASE_URL = "https://api.football-data.org/v4";
+const ARSENAL_ID = 57;
+
+interface Team {
+  id: number;
+  name: string;
+  shortName: string;
+  tla: string;
+}
+
+interface Match {
+  id: number;
+  utcDate: string;
+  status: "SCHEDULED" | "TIMED" | "IN_PLAY" | "PAUSED" | "FINISHED" | "POSTPONED" | "CANCELLED";
+  competition: {
+    name: string;
+    code: string;
+  };
+  homeTeam: Team;
+  awayTeam: Team;
+  score: {
+    fullTime: {
+      home: number | null;
+      away: number | null;
+    };
+  };
+}
+
+interface StandingsEntry {
+  position: number;
+  team: Team;
+  playedGames: number;
+  won: number;
+  draw: number;
+  lost: number;
+  goalDifference: number;
+  points: number;
+}
 
 export interface MatchData {
   id: number;
@@ -34,35 +72,19 @@ export interface ScorerData {
   matches: number;
 }
 
-interface SportsDBEvent {
-  idEvent: string;
-  strEvent: string;
-  strTimestamp: string;
-  strLeague: string;
-  strHomeTeam: string;
-  strAwayTeam: string;
-  intHomeScore: string | null;
-  intAwayScore: string | null;
-  strStatus: string | null;
-  idHomeTeam: string;
-  idAwayTeam: string;
-}
-
-interface SportsDBStanding {
-  intRank: string;
-  strTeam: string;
-  idTeam: string;
-  intPlayed: string;
-  intWin: string;
-  intDraw: string;
-  intLoss: string;
-  intGoalDifference: string;
-  intPoints: string;
-}
-
 async function fetchAPI<T>(endpoint: string, revalidate = 300): Promise<T | null> {
+  const apiKey = process.env.FOOTBALL_DATA_API_KEY;
+
+  if (!apiKey) {
+    console.error("FOOTBALL_DATA_API_KEY not set");
+    return null;
+  }
+
   try {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
+      headers: {
+        "X-Auth-Token": apiKey,
+      },
       next: { revalidate },
     });
 
@@ -78,96 +100,52 @@ async function fetchAPI<T>(endpoint: string, revalidate = 300): Promise<T | null
   }
 }
 
-function isArsenalMatch(event: SportsDBEvent): boolean {
-  return (
-    event.strHomeTeam === "Arsenal" ||
-    event.strAwayTeam === "Arsenal" ||
-    event.idHomeTeam === ARSENAL_ID ||
-    event.idAwayTeam === ARSENAL_ID
-  );
-}
-
-function eventToMatchData(event: SportsDBEvent): MatchData {
-  const isHome = event.strHomeTeam === "Arsenal" || event.idHomeTeam === ARSENAL_ID;
-  return {
-    id: parseInt(event.idEvent),
-    date: event.strTimestamp,
-    status: event.strStatus || "SCHEDULED",
-    competition: event.strLeague,
-    competitionCode: "PL",
-    homeTeam: event.strHomeTeam,
-    awayTeam: event.strAwayTeam,
-    homeScore: event.intHomeScore ? parseInt(event.intHomeScore) : null,
-    awayScore: event.intAwayScore ? parseInt(event.intAwayScore) : null,
-    isHome,
-  };
-}
-
-function getSeason(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  // Season starts in August (month 7), so before August use previous year
-  const seasonStart = month < 7 ? year - 1 : year;
-  return `${seasonStart}-${seasonStart + 1}`;
-}
-
-// Cache season events to avoid multiple fetches
-let cachedSeasonEvents: SportsDBEvent[] | null = null;
-let cacheTime = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-async function getSeasonEvents(): Promise<SportsDBEvent[]> {
-  const now = Date.now();
-  if (cachedSeasonEvents && now - cacheTime < CACHE_DURATION) {
-    return cachedSeasonEvents;
-  }
-
-  const season = getSeason();
-  const data = await fetchAPI<{ events: SportsDBEvent[] | null }>(
-    `/eventsseason.php?id=${PREMIER_LEAGUE_ID}&s=${season}`
-  );
-
-  if (data?.events) {
-    cachedSeasonEvents = data.events;
-    cacheTime = now;
-    return data.events;
-  }
-
-  return [];
-}
-
 export async function getRecentResults(): Promise<MatchData[]> {
-  const data = await fetchAPI<{ results: SportsDBEvent[] | null }>(
-    `/eventslast.php?id=${ARSENAL_ID}`
+  const data = await fetchAPI<{ matches: Match[] }>(
+    `/teams/${ARSENAL_ID}/matches?status=FINISHED&limit=5`
   );
 
-  if (!data?.results) return [];
+  if (!data?.matches) return [];
 
-  // Filter to only Arsenal matches (the API sometimes returns wrong data)
-  return data.results
-    .filter(isArsenalMatch)
+  return data.matches
+    .sort((a, b) => new Date(b.utcDate).getTime() - new Date(a.utcDate).getTime())
     .slice(0, 5)
-    .map(eventToMatchData);
+    .map((match) => ({
+      id: match.id,
+      date: match.utcDate,
+      status: match.status,
+      competition: match.competition.name,
+      competitionCode: match.competition.code,
+      homeTeam: match.homeTeam.shortName || match.homeTeam.name,
+      awayTeam: match.awayTeam.shortName || match.awayTeam.name,
+      homeScore: match.score.fullTime.home,
+      awayScore: match.score.fullTime.away,
+      isHome: match.homeTeam.id === ARSENAL_ID,
+    }));
 }
 
 export async function getUpcomingFixtures(): Promise<MatchData[]> {
-  const events = await getSeasonEvents();
-  const now = new Date();
+  const data = await fetchAPI<{ matches: Match[] }>(
+    `/teams/${ARSENAL_ID}/matches?status=SCHEDULED&limit=5`
+  );
 
-  const upcoming = events
-    .filter((e) => {
-      if (!isArsenalMatch(e)) return false;
-      const matchDate = new Date(e.strTimestamp);
-      const isUpcoming = matchDate > now;
-      const notFinished = e.strStatus !== "Match Finished";
-      return isUpcoming && notFinished;
-    })
-    .sort((a, b) => new Date(a.strTimestamp).getTime() - new Date(b.strTimestamp).getTime())
+  if (!data?.matches) return [];
+
+  return data.matches
+    .sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime())
     .slice(0, 5)
-    .map(eventToMatchData);
-
-  return upcoming;
+    .map((match) => ({
+      id: match.id,
+      date: match.utcDate,
+      status: match.status,
+      competition: match.competition.name,
+      competitionCode: match.competition.code,
+      homeTeam: match.homeTeam.shortName || match.homeTeam.name,
+      awayTeam: match.awayTeam.shortName || match.awayTeam.name,
+      homeScore: null,
+      awayScore: null,
+      isHome: match.homeTeam.id === ARSENAL_ID,
+    }));
 }
 
 export async function getNextMatch(): Promise<MatchData | null> {
@@ -176,34 +154,57 @@ export async function getNextMatch(): Promise<MatchData | null> {
 }
 
 export async function getLiveMatch(): Promise<MatchData | null> {
-  // TheSportsDB free tier doesn't have live match data
-  return null;
+  const data = await fetchAPI<{ matches: Match[] }>(
+    `/teams/${ARSENAL_ID}/matches?status=IN_PLAY`,
+    30
+  );
+
+  if (!data?.matches?.length) return null;
+
+  const match = data.matches[0];
+  return {
+    id: match.id,
+    date: match.utcDate,
+    status: match.status,
+    competition: match.competition.name,
+    competitionCode: match.competition.code,
+    homeTeam: match.homeTeam.shortName || match.homeTeam.name,
+    awayTeam: match.awayTeam.shortName || match.awayTeam.name,
+    homeScore: match.score.fullTime.home,
+    awayScore: match.score.fullTime.away,
+    isHome: match.homeTeam.id === ARSENAL_ID,
+  };
 }
 
 export async function getStandings(): Promise<StandingsData[]> {
-  const season = getSeason();
-  const data = await fetchAPI<{ table: SportsDBStanding[] | null }>(
-    `/lookuptable.php?l=${PREMIER_LEAGUE_ID}&s=${season}`
-  );
+  const data = await fetchAPI<{
+    standings: Array<{
+      type: string;
+      table: StandingsEntry[];
+    }>;
+  }>("/competitions/PL/standings");
 
-  if (!data?.table) return [];
+  if (!data?.standings) return [];
 
-  return data.table.map((entry) => ({
-    position: parseInt(entry.intRank),
-    team: entry.strTeam,
-    teamId: parseInt(entry.idTeam),
-    played: parseInt(entry.intPlayed),
-    won: parseInt(entry.intWin),
-    drawn: parseInt(entry.intDraw),
-    lost: parseInt(entry.intLoss),
-    gd: parseInt(entry.intGoalDifference),
-    points: parseInt(entry.intPoints),
+  const total = data.standings.find((s) => s.type === "TOTAL");
+  if (!total) return [];
+
+  return total.table.map((entry) => ({
+    position: entry.position,
+    team: entry.team.shortName || entry.team.name,
+    teamId: entry.team.id,
+    played: entry.playedGames,
+    won: entry.won,
+    drawn: entry.draw,
+    lost: entry.lost,
+    gd: entry.goalDifference,
+    points: entry.points,
   }));
 }
 
 export async function getTopScorers(): Promise<ScorerData[]> {
-  // TheSportsDB free tier doesn't have scorer data
+  // football-data.org free tier has limited scorer data
   return [];
 }
 
-export const ARSENAL_TEAM_ID = parseInt(ARSENAL_ID);
+export const ARSENAL_TEAM_ID = ARSENAL_ID;
