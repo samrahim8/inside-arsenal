@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 
-// Target date: Arsenal vs Everton — Sunday March 15, 2026 at 2:00 PM GMT
-const TARGET_DATE = new Date("2026-03-15T14:00:00Z");
+// Target date: Arsenal vs Everton — Saturday March 14, 2026 at 5:30 PM GMT
+const TARGET_DATE = new Date("2026-03-14T17:30:00Z");
 
 const standings = [
   { pos: 1, team: "Arsenal", p: 30, w: 20, d: 7, l: 3, gd: 42, pts: 67 },
@@ -37,7 +37,7 @@ const recentResults = [
 ];
 
 const upcomingFixtures = [
-  { opponent: "Everton", venue: "H", date: "Mar 15", comp: "PL" },
+  { opponent: "Everton", venue: "H", date: "TODAY", comp: "PL" },
   { opponent: "Leverkusen UCL", venue: "H", date: "Mar 17", comp: "UCL" },
   { opponent: "Wolves", venue: "A", date: "Mar 21", comp: "PL" },
   { opponent: "Southampton FA Cup", venue: "A", date: "Mar 28", comp: "FA Cup" },
@@ -176,7 +176,7 @@ function TabSite() {
           <span className="text-white">EVERTON</span>
         </h1>
         <p className="font-mono text-sm text-secondary mb-8">
-          Emirates Stadium · Sun Mar 15, 2:00 PM
+          Emirates Stadium · Sat Mar 14, 5:30 PM
         </p>
         <div className="mb-12">
           <Countdown />
@@ -388,7 +388,7 @@ function TabEmail() {
             Here&apos;s the thing: this isn&apos;t 22/23. This squad is deeper, more experienced, and playing with the kind of control that title winners have. The Chelsea win wasn&apos;t pretty. Brighton was a grind. That&apos;s the point. Those are the games you have to win, and we&apos;re winning them.
           </p>
           <p className="text-body leading-relaxed">
-            Odegaard&apos;s knee is the only cloud. But Leverkusen showed we can compete without him. Everton tomorrow, then Wolves before the break. Take care of business, and we go into April with the title in our hands.
+            Odegaard&apos;s knee is the only cloud. But Leverkusen showed we can compete without him. Everton today, then Wolves before the break. Take care of business, and we go into April with the title in our hands.
           </p>
         </div>
       </section>
@@ -411,7 +411,7 @@ function TabEmail() {
             { opponent: "Brighton", venue: "A", score: "1-0", result: "W", type: "result" },
             { opponent: "Mansfield FA Cup", venue: "A", score: "2-1", result: "W", type: "result" },
             { opponent: "Leverkusen UCL", venue: "A", score: "1-1", result: "D", type: "result" },
-            { opponent: "Everton", venue: "H", date: "TOMORROW", type: "fixture", highlight: true },
+            { opponent: "Everton", venue: "H", date: "TODAY", type: "fixture", highlight: true },
             { opponent: "Leverkusen UCL", venue: "H", date: "Mar 17/18", type: "fixture" },
             { opponent: "Wolves", venue: "A", date: "Mar 21", type: "fixture" },
           ].map((match, i) => (
@@ -427,7 +427,7 @@ function TabEmail() {
               {match.type === "result" ? (
                 <span className="font-mono font-bold">{match.score}</span>
               ) : match.highlight ? (
-                <span className="font-mono text-xs px-2 py-1 bg-arsenal rounded text-white">TOMORROW</span>
+                <span className="font-mono text-xs px-2 py-1 bg-arsenal rounded text-white">TODAY</span>
               ) : (
                 <span className="font-mono text-sm text-secondary">{match.date}</span>
               )}
