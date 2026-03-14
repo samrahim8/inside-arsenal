@@ -10,6 +10,9 @@ const config: Config = {
         background: "#0a0a0a",
         surface: "#141414",
         arsenal: "#EF4444",
+        body: "rgba(255,255,255,0.7)",
+        secondary: "rgba(255,255,255,0.45)",
+        muted: "rgba(255,255,255,0.3)",
       },
       fontFamily: {
         serif: ["var(--font-instrument-serif)", "serif"],

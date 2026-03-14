@@ -135,3 +135,17 @@ a:hover {
     radial-gradient(ellipse 60% 40% at 80% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 40%),
     var(--background);
 }
+
+/* Fade in animation for tab content */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 200ms ease-out forwards;
+}
