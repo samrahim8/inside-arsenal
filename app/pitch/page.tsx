@@ -615,21 +615,79 @@ function TabPlan() {
       {/* Monetization */}
       <section>
         <SectionLabel>Monetization</SectionLabel>
-        <div className="grid md:grid-cols-3 gap-4 mb-6">
-          {[
-            { title: "Sponsorships", desc: "Arsenal-adjacent brands (betting, kits, streaming, travel) pay for placement once the list is big enough." },
-            { title: "Merch", desc: "Inside Arsenal FC branded gear. Or affiliate deals with kit/apparel companies." },
-            { title: "Affiliate", desc: "Streaming services, ticket platforms, fantasy football tools. Passive links in every issue." },
-          ].map((item) => (
-            <Card key={item.title} className="p-5">
-              <h3 className="font-serif text-lg mb-2">{item.title}</h3>
-              <p className="text-sm text-body">{item.desc}</p>
-            </Card>
-          ))}
+
+        {/* Sponsorships */}
+        <div className="mb-8">
+          <h3 className="font-serif text-xl mb-4">Sponsorships</h3>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              { title: "Newsletter Sponsors", desc: "Arsenal-adjacent brands pay for premium placement. Betting, kits, streaming, travel, fantasy sports.", price: "$200-1,500/issue" },
+              { title: "Dedicated Sends", desc: "Full newsletter takeover for a brand. One-off promotional issue to the full list.", price: "$500-2,000/send" },
+              { title: "Social Integrations", desc: "Sponsored TikToks, Instagram stories, YouTube mentions. Bundle with newsletter for premium rates.", price: "$300-1,000/post" },
+            ].map((item) => (
+              <Card key={item.title} className="p-5">
+                <h4 className="font-medium mb-2">{item.title}</h4>
+                <p className="text-sm text-body mb-3">{item.desc}</p>
+                <p className="font-mono text-sm text-arsenal">{item.price}</p>
+              </Card>
+            ))}
+          </div>
         </div>
-        <p className="text-secondary text-sm text-center">
-          Monetization starts at ~2,500 subscribers. Until then, the only job is making the newsletter great.
-        </p>
+
+        {/* Creative Monetization */}
+        <div className="mb-8">
+          <h3 className="font-serif text-xl mb-2">Creative Monetization</h3>
+          <p className="text-secondary text-sm mb-4">Beyond ads. Things fans actually want to pay for.</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              {
+                title: "Snail Mail Club",
+                desc: "Monthly physical mailer. Match day poster, stickers, exclusive print content, handwritten notes. Limited to 100-500 members.",
+                price: "$15-25/month",
+                icon: "PHYSICAL"
+              },
+              {
+                title: "Matchday Experiences",
+                desc: "Curated away day trips. Watch parties in cities. Emirates Stadium tours with the community. Premium access, real connections.",
+                price: "$50-500/event",
+                icon: "EXPERIENCES"
+              },
+              {
+                title: "Insider Community",
+                desc: "Paid Discord or Slack. Early access to content, direct Q&As, group chats during matches, exclusive predictions.",
+                price: "$5-10/month",
+                icon: "COMMUNITY"
+              },
+              {
+                title: "Limited Merch Drops",
+                desc: "Capsule collections. Not always-on merch, but rare drops that sell out. Scarves, pins, zines, collab pieces.",
+                price: "$20-75/item",
+                icon: "DROPS"
+              },
+            ].map((item) => (
+              <Card key={item.title} className="p-5">
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-medium">{item.title}</h4>
+                  <span className="font-mono text-[10px] text-arsenal tracking-wider">{item.icon}</span>
+                </div>
+                <p className="text-sm text-body mb-3">{item.desc}</p>
+                <p className="font-mono text-sm text-arsenal">{item.price}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <Card className="p-5 border-l-2 border-l-arsenal">
+          <p className="text-body">
+            <span className="text-arsenal font-medium">Phase 1 (0-2,500 subs):</span> Focus on growth. No monetization.
+          </p>
+          <p className="text-body mt-2">
+            <span className="text-arsenal font-medium">Phase 2 (2,500-10K):</span> Sponsorships + Snail Mail Club pilot.
+          </p>
+          <p className="text-body mt-2">
+            <span className="text-arsenal font-medium">Phase 3 (10K+):</span> Full creative monetization. Experiences. Community. Drops.
+          </p>
+        </Card>
       </section>
     </div>
   );
