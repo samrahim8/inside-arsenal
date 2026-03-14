@@ -463,9 +463,10 @@ function TabPlan() {
         <div className="space-y-4">
           {[
             { title: "HIS SOCIALS", subtitle: "TikTok · Instagram · YouTube", desc: "Hundreds of thousands following", annotation: "CTA in every post" },
+            { title: "CREATOR PARTNERSHIPS", subtitle: "Micro-influencers · Guest cameos", desc: "Their audience becomes ours", annotation: "Featured creators share" },
             { title: "LINK IN BIO", subtitle: "insidearsenalfc.com", desc: "The landing page", annotation: "Live data = reason to visit" },
             { title: "EMAIL SIGNUP", subtitle: "Beehiiv form on landing page", desc: "Convert visitors to subscribers", annotation: "Every Friday" },
-            { title: "WEEKLY NEWSLETTER", subtitle: "Clip + Timeline + Take + Table", desc: "The product", annotation: "Featured creator shares" },
+            { title: "WEEKLY NEWSLETTER", subtitle: "Clip + Timeline + Take + Guests", desc: "The product", annotation: "Guest writers amplify" },
             { title: "CROSS-PROMO FLYWHEEL", subtitle: "New audience discovers us", desc: "Growth loop", annotation: null },
           ].map((step, i) => (
             <div key={i}>
@@ -506,6 +507,51 @@ function TabPlan() {
         </p>
       </section>
 
+      {/* Creator Partnerships */}
+      <section>
+        <SectionLabel>Creator Partnerships</SectionLabel>
+        <p className="text-body mb-6">
+          Micro-influencers and Arsenal creators are the top of the funnel. We bring them in, they bring their audience.
+        </p>
+        <div className="grid md:grid-cols-2 gap-4 mb-6">
+          {[
+            {
+              title: "Micro-Influencer Collabs",
+              desc: "Partner with Arsenal fan accounts (5K-50K followers). They get exposure in the newsletter, we get access to their engaged audience. Mutual growth.",
+              examples: "Fan accounts, match day vloggers, tactics analysts, kit collectors"
+            },
+            {
+              title: "Special Guest Cameos",
+              desc: "Invite creators to write 'The Take' section or curate 'Clip of the Week'. Their name in the byline = their audience in our funnel.",
+              examples: "Guest takeovers, co-written issues, creator spotlights"
+            },
+          ].map((item) => (
+            <Card key={item.title} className="p-5">
+              <h3 className="font-serif text-lg mb-2">{item.title}</h3>
+              <p className="text-sm text-body mb-3">{item.desc}</p>
+              <p className="font-mono text-xs text-secondary">{item.examples}</p>
+            </Card>
+          ))}
+        </div>
+        <Card className="p-5 border-l-2 border-l-arsenal">
+          <h4 className="font-mono text-sm text-arsenal mb-2">THE PLAYBOOK</h4>
+          <div className="grid md:grid-cols-4 gap-4">
+            {[
+              { step: "1", action: "Scout", detail: "Find creators making great Arsenal content" },
+              { step: "2", action: "Engage", detail: "Comment, share, build relationship" },
+              { step: "3", action: "Invite", detail: "Feature them or offer guest spot" },
+              { step: "4", action: "Convert", detail: "Their promo = new subscribers" },
+            ].map((s) => (
+              <div key={s.step}>
+                <span className="font-mono text-2xl text-arsenal font-bold">{s.step}</span>
+                <p className="font-medium mt-1">{s.action}</p>
+                <p className="text-xs text-secondary">{s.detail}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </section>
+
       {/* CTAs */}
       <section>
         <SectionLabel>Caption CTAs</SectionLabel>
@@ -533,10 +579,10 @@ function TabPlan() {
         <SectionLabel>Launch Timeline</SectionLabel>
         <div className="space-y-4">
           {[
-            { week: "Week -1", title: "Pre-Launch", desc: "Set up Beehiiv, deploy site, soft tease on stories, post launch video, pin it" },
-            { week: "Week 1", title: "Issue #1", desc: "Ship first newsletter, begin rotating CTAs, DM featured creator" },
-            { week: "Weeks 2-4", title: "Rhythm", desc: "Weekly issues, weekly cross-promo, story CTAs, build creator list" },
-            { week: "Weeks 5-8", title: "Scale", desc: "Reddit seeding, supporter group outreach, 2nd wave of creator features" },
+            { week: "Week -1", title: "Pre-Launch", desc: "Set up Beehiiv, deploy site, soft tease on stories, start DMing creators, post launch video" },
+            { week: "Week 1", title: "Issue #1", desc: "Ship first newsletter, feature a creator, DM them before it drops, rotating CTAs begin" },
+            { week: "Weeks 2-4", title: "Rhythm", desc: "Weekly issues, weekly creator features, first guest cameo in Issue #3 or #4" },
+            { week: "Weeks 5-8", title: "Scale", desc: "Reddit seeding, supporter group outreach, recurring guest writers, micro-influencer partnerships" },
           ].map((milestone, i) => (
             <Card key={i} className="p-5">
               <span className="font-mono text-xs text-arsenal">{milestone.week}</span>
